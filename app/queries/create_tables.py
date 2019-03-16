@@ -1,3 +1,6 @@
+from app.db import pool
+
+@pool.execute
 def create_tables():
   return """
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
