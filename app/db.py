@@ -10,12 +10,12 @@ from flask import g
 
 dotenv.load_dotenv()
 
-# convert datetime objects returned by psycopg2 into str
-class CustomDateEncoder(json.JSONEncoder):
-  def default(self, obj):
-    if isinstance(obj, date):
-      return str(obj)
-    return json.JSONEncoder.default(self, obj)
+# # convert datetime objects returned by psycopg2 into str
+# class CustomDateEncoder(json.JSONEncoder):
+#   def default(self, obj):
+#     if isinstance(obj, date):
+#       return str(obj)
+#     return json.JSONEncoder.default(self, obj)
 
 
 class Pool:
@@ -57,7 +57,7 @@ class Pool:
         with conn.cursor(cursor_factory=RealDictCursor) as c:
           sql, values = self.unwrap_pg_statement(func, *args, **kwargs)
           c.execute(sql, values)
-          return[json.dumps(x, cls=CustomDateEncoder) for x in c.fetchall()] if sql.strip().upper().startswith("SELECT") else True
+          return[x for x in c.fetchall()] if sql.strip().upper().startswith("SELECT") else True
     return wrapper
 
   def executemany(self, func):
