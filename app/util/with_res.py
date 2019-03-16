@@ -1,8 +1,6 @@
 import functools
 from flask import jsonify
 
-# from app.util.validate_req import validate
-
 class ApiResult(object):
   def __init__(self, data={}, message="", errors=[], status=200):
     self.data = data
@@ -10,12 +8,12 @@ class ApiResult(object):
     self.errors = errors
     self.status = status
 
-  def add_error(self, msg="", err=None):
+  def add_error(self, err=None, msg=""):
     error = {"message": msg, "error": str(err)}
     self.errors.append(error)
 
-  def set_data(self, results):
-    self.data.update({"results": results})
+  def set_data(self, data):
+    self.data.update(data)
 
   def json(self):
     return jsonify(

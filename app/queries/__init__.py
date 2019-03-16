@@ -1,6 +1,6 @@
 from app.db import pool
 
-@pool.execute
+@pool.execute()
 def drop_tables():
   return """
     DROP TABLE users CASCADE;
@@ -9,7 +9,7 @@ def drop_tables():
     DROP TABLE action_taken;
   """
 
-@pool.execute
+@pool.execute()
 def create_tables():
   return """
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
@@ -44,7 +44,7 @@ def create_tables():
     );
   """
 
-@pool.execute
+@pool.execute()
 def insert_user_and_action_category():
   return """
     INSERT INTO users (username, pw_hash) VALUES ('Jacob', 'asdfasdf');
@@ -52,7 +52,7 @@ def insert_user_and_action_category():
     INSERT INTO action_category (action_name) VALUES ('took walk');
   """
 
-@pool.execute
+@pool.execute()
 def insert_test_values():
   return """
     INSERT INTO action_taken (user_id, duration, category_id, description) 

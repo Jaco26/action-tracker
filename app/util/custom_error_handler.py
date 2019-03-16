@@ -3,6 +3,7 @@ from werkzeug.exceptions import HTTPException, default_exceptions
 
 class CustomErrorHandler:
   def jsonify_default_exceptions(self, error):
+
     if isinstance(error, HTTPException):
       result = {
         'code': error.code,
