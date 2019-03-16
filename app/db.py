@@ -41,6 +41,7 @@ class Pool:
 
   def unwrap_pg_statement(self, func, *args, **kwargs):
     items = func(*args, **kwargs)
+    print(type(items))
     if type(items) is str:
       return items, []
     elif type(items) is tuple:

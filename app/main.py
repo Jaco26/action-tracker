@@ -3,7 +3,7 @@ from datetime import datetime
 
 from .util.json_encoder import CustomJSONEncoder
 from .db import pool
-from .queries import create_tables
+from . import queries
 
 def create_app():
   app = Flask(__name__)
@@ -11,9 +11,12 @@ def create_app():
 
   pool.init_app(app)
 
-  @app.before_first_request
-  def do_before():
-    create_tables.create_tables()
+  # @app.before_first_request
+  # def do_before():
+  #   queries.drop_tables()
+  #   queries.create_tables()
+  #   queries.insert_user_and_action_category()
+  #   queries.insert_test_values()
 
   @app.route("/")
   def index():
