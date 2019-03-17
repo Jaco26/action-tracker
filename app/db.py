@@ -73,4 +73,4 @@ class Pool:
     return wrapper
 
 
-pool = Pool(os.environ['DB_URI'])
+pool = Pool(os.environ['DATABASE_URL'])
