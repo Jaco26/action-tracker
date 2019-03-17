@@ -34,8 +34,8 @@ def create_app():
   # def do_before():
   #   queries.drop_tables()
   #   queries.create_tables()
-  #   queries.insert_user_and_action_category()
-  #   queries.insert_test_values()
+    # queries.insert_user_and_action_category()
+    # queries.insert_test_values()
 
   @app.route("/")
   def index():

@@ -32,8 +32,32 @@ def register(req_body, res):
     return res
 
 
-@auth_bp_v1.route("/", methods=["GET", "POST"])
-def bla():
-  res = ApiResult()
-  res.add_error(message="Hi")
+@auth_bp_v1.route("/login", methods=["POST"])
+@with_res
+@validate({
+  'username': str,
+  'password': str,
+})
+def login(req_body, res):
+  try:
+    username = req_body.get("username")
+    user = auth_sql.get_user_by_username(username)
+    if user:
+      if check_password_hash(user.get("pw_hash"), req_body.get("password")):
+        res.set_data({
+          'access_token': create_access_token(identity=user.get("id")),
+          'refresh_token': create_refresh_token(identity=user.get("id")),
+        })
+        res.message = "You're logged in!"
+  except BaseException as e:
+    res.add_error(e)
+  finally:
+    return res
+
+
+@auth_bp_v1.route("/refresh", methods=["POST"])
+@jwt_refresh_token_required
+@with_res
+def refresh(res):
+  res.set_data({ 'access_token': create_access_token(identity=get_jwt_identity()) })
   return res
