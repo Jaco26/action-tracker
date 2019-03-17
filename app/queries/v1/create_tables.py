@@ -37,6 +37,7 @@ def create_tables():
 
     CREATE TABLE IF NOT EXISTS action_taken 
     (
+      id UUID PRIMARY KEY default uuid_generate_v4(),
       user_id UUID references users(id),
       ts TIMESTAMPTZ DEFAULT timezone('utc'::text, now()),
       duration TSTZRANGE,
@@ -44,25 +45,3 @@ def create_tables():
       description VARCHAR
     );
   """
-
-@pool.execute()
-def insert_user_and_action_category():
-  return """
-    INSERT INTO users (username, pw_hash) VALUES ('Jacob', 'asdfasdf');
-
-    INSERT INTO action_category (action_name) VALUES ('took walk');
-  """
-
-@pool.execute()
-def insert_test_values():
-  return """
-    INSERT INTO action_taken (user_id, duration, category_id, description) 
-    VALUES (
-      (SELECT id FROM users WHERE username ILIKE %s ESCAPE ''),
-      '[2018-10-21 14:30, 2018-10-21 14:50]',
-      (SELECT id FROM action_category WHERE action_name ILIKE %s ESCAPE ''),
-      'I walked around to the river and back'
-    );
-  """, ('%jacob%', '%walk%')
-
-

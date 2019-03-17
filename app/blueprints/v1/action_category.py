@@ -1,12 +1,10 @@
 from flask import Blueprint, request
-from flask.views import MethodView
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.queries.v1 import action_category
 from app.util.custom_api_response import with_res
 from app.util.validate_req import validate
 
-print(action_category.get_all)
 
 action_category_bp_v1 = Blueprint("action_category_bp_v1", __name__)
 
@@ -19,7 +17,6 @@ action_category_bp_v1 = Blueprint("action_category_bp_v1", __name__)
   "new_category_name": str,
 })
 def action_category_view(req_body, res):
-  print(req_body, res)
   try:
     user_id = get_jwt_identity()
     if request.method == "GET":

@@ -11,12 +11,13 @@ from .util import jwt
 # database threaded connection pool
 from .db import pool
 
-# some sql scripts to create tables and insert initial values
-from . import queries
+# some sql scripts to create tables
+from .queries.v1 import create_tables
 
 # blueprints
 from .blueprints.v1.auth import auth_bp_v1
 from .blueprints.v1.action_category import action_category_bp_v1
+from .blueprints.v1.action_taken import action_taken_bp_v1
 
 def create_app():
   app = ApiFlask(__name__)
@@ -31,13 +32,12 @@ def create_app():
 
   app.register_blueprint(auth_bp_v1, url_prefix="/api/v1/auth")
   app.register_blueprint(action_category_bp_v1, url_prefix="/api/v1/action-category")
+  app.register_blueprint(action_taken_bp_v1, url_prefix="/api/v1/action-taken")
 
   # @app.before_first_request
   # def do_before():
-  #   queries.drop_tables()
-  #   queries.create_tables()
-  #   # queries.insert_user_and_action_category()
-  #   # queries.insert_test_values()
+  #   create_tables.drop_tables()
+  #   create_tables.create_tables()
 
   @app.route("/")
   def index():
