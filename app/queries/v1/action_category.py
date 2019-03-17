@@ -3,7 +3,7 @@ from app.db import pool
 @pool.execute()
 def create(user_id, category_name):
   sql = "INSERT INTO action_category (user_id, category_name) VALUES (%s, %s);"
-  return sql, [user_id, action_name]
+  return sql, [user_id, category_name]
 
 @pool.execute()
 def update(new_category_name, category_id, user_id):
@@ -17,5 +17,5 @@ def delete(category_id, user_id):
 
 @pool.execute()
 def get_all(user_id):
-  return "SELECT * FROM action_category WHERE user_id = %s;", [user_id]
+  return "SELECT id, category_name FROM action_category WHERE user_id = %s;", [user_id]
 

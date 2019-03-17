@@ -1,3 +1,4 @@
+import datetime
 from flask import Blueprint
 from flask_jwt_extended import (
   jwt_required, jwt_refresh_token_required, create_access_token,
@@ -45,7 +46,7 @@ def login(req_body, res):
     if user:
       if check_password_hash(user.get("pw_hash"), req_body.get("password")):
         res.add_data({
-          'access_token': create_access_token(identity=user.get("id")),
+          'access_token': create_access_token(identity=user.get("id"), expires_delta=datetime.timedelta(seconds=7200)), # expires in 2 hours
           'refresh_token': create_refresh_token(identity=user.get("id")),
         })
         res.message = "You're logged in!"
@@ -59,8 +60,14 @@ def login(req_body, res):
 @jwt_refresh_token_required
 @with_res
 def refresh(res):
-  res.add_data({ 'access_token': create_access_token(identity=get_jwt_identity()) })
-  return res
+  try:
+    res.add_data({ 
+      'access_token': create_access_token(identity=get_jwt_identity(), expires_delta=datetime.timedelta(seconds=7200)), # expires in 2 hours
+    })
+  except BaseException as e:
+    res.add_error(e)
+  finally:
+    return res
 
 
 @auth_bp_v1.route("/logout-access", methods=["POST"])

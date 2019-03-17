@@ -16,6 +16,7 @@ from . import queries
 
 # blueprints
 from .blueprints.v1.auth import auth_bp_v1
+from .blueprints.v1.action_category import action_category_bp_v1
 
 def create_app():
   app = ApiFlask(__name__)
@@ -29,13 +30,14 @@ def create_app():
   jwt.init_app(app)
 
   app.register_blueprint(auth_bp_v1, url_prefix="/api/v1/auth")
+  app.register_blueprint(action_category_bp_v1, url_prefix="/api/v1/action-category")
 
   # @app.before_first_request
   # def do_before():
   #   queries.drop_tables()
   #   queries.create_tables()
-    # queries.insert_user_and_action_category()
-    # queries.insert_test_values()
+  #   # queries.insert_user_and_action_category()
+  #   # queries.insert_test_values()
 
   @app.route("/")
   def index():

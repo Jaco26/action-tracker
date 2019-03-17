@@ -55,7 +55,7 @@ class Pool:
                 result = [x for x in c.fetchall()]
               elif cursor_method == "fetchone":
                 result = c.fetchone()
-              if type(result) is list and len(result):
+              if type(result) is list and not len(result):
                 return None
               return result
             return True
