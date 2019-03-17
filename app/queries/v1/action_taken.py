@@ -21,7 +21,7 @@ def delete(action_id, user_id):
 
 @pool.execute()
 def get_all(user_id):
-  sql = """SELECT ac.category_name, at.description, at.ts 
+  sql = """SELECT ac.category_name, at.description, at.ts, at.id 
            FROM action_taken AS at JOIN action_category AS ac 
            ON at.category_id = ac.id 
            WHERE at.user_id = %s;"""
