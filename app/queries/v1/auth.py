@@ -5,7 +5,7 @@ def get_jti(jti):
   return "SELECT * FROM revoked_token WHERE jti = %s;", [jti]
 
 @pool.execute()
-def save_jti(jti):
+def revoke_jti(jti):
   return "INSERT INTO revoked_token (jti) VALUES (%s);", [jti]
 
 @pool.execute(cursor_method="fetchone")

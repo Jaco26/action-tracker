@@ -61,3 +61,31 @@ def login(req_body, res):
 def refresh(res):
   res.set_data({ 'access_token': create_access_token(identity=get_jwt_identity()) })
   return res
+
+
+@auth_bp_v1.route("/logout-access", methods=["POST"])
+@jwt_required
+@with_res
+def logout_access(res):
+  try:
+    jti = get_raw_jwt()['jti']
+    auth_sql.revoke_jti(jti)
+    res.message = "Access token revoked!"
+  except BaseException as e:
+    res.add_error(e, "Error revoking access token")
+  finally:
+    return res
+
+
+@auth_bp_v1.route("/logout-refresh", methods=["POST"])
+@jwt_refresh_token_required
+@with_res
+def logout_refresh(res):
+  try:
+    jti = get_raw_jwt()['jti']
+    auth_sql.revoke_jti(jti)
+    res.message = "Refresh token revoked!"
+  except BaseException as e:
+    res.add_error(e, "Error revoking refresh token")
+  finally:
+    return res
