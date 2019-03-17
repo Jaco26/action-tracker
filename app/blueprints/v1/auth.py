@@ -44,7 +44,7 @@ def login(req_body, res):
     user = auth_sql.get_user_by_username(username)
     if user:
       if check_password_hash(user.get("pw_hash"), req_body.get("password")):
-        res.set_data({
+        res.add_data({
           'access_token': create_access_token(identity=user.get("id")),
           'refresh_token': create_refresh_token(identity=user.get("id")),
         })
@@ -59,7 +59,7 @@ def login(req_body, res):
 @jwt_refresh_token_required
 @with_res
 def refresh(res):
-  res.set_data({ 'access_token': create_access_token(identity=get_jwt_identity()) })
+  res.add_data({ 'access_token': create_access_token(identity=get_jwt_identity()) })
   return res
 
 

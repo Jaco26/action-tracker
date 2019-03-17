@@ -28,10 +28,11 @@ def create_tables():
       pw_hash VARCHAR UNIQUE NOT NULL
     );
 
-    CREATE TABLE IF NOT EXISTS action_category 
+    CREATE TABLE IF NOT EXISTS action_category
     (
       id UUID PRIMARY KEY default uuid_generate_v4(),
-      action_name VARCHAR UNIQUE NOT NULL
+      user_id UUID references users(id) NOT NULL,
+      category_name VARCHAR UNIQUE NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS action_taken 

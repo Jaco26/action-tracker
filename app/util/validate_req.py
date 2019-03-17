@@ -1,9 +1,9 @@
 import functools
 from flask import request, abort
-from voluptuous import Schema, Invalid, REMOVE_EXTRA
+from voluptuous import Schema, Invalid, REMOVE_EXTRA, Optional
 
 def validate(schema_dict):
-  schema = Schema(schema_dict, extra=REMOVE_EXTRA)
+  schema = Schema(schema_dict, extra=REMOVE_EXTRA, required=True)
   def decorator(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
