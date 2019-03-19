@@ -2,6 +2,7 @@ from app.db import pool
 
 @pool.execute()
 def create(user_id, action):
+  print(user_id)
   sql = """INSERT INTO action_taken (user_id, ts, category_id, description) 
            VALUES (%s, %s, %s, %s);"""
   return sql, [user_id, action["ts"], action["category_id"], action["description"]]

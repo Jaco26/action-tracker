@@ -1,35 +1,40 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from datetime import datetime
+
 
 from app.queries.v1 import action_taken
 from app.util.custom_api_response import with_res
 from app.util.validate_req import validate
 from app.util.validate_date_format import validate_dates
 
+from app.util.req_body_types import Action
+
 action_taken_bp_v1 = Blueprint('action_taken_bp_v1', __name__)
 
 @action_taken_bp_v1.route("/", methods=["GET", "POST", "PUT", "DELETE"])
 @jwt_required
 @with_res
+# @validate({
+#   'action_id': str,
+#   'category_id': str,
+#   'duration': str,
+#   'description': str,
+#   'ts': str
+# })
 @validate({
-  'action_id': str,
-  'category_id': str,
-  'duration': str,
-  'description': str,
-  'ts': str
+  "action": {
+    "id": str,
+    "category_id": str,
+    "duration": str,
+    "description": str,
+    "ts": str,
+  }
 })
 def action_taken_view(req_body, res):
+  
   try:
     user_id = get_jwt_identity()
-    utc_now = datetime.utcnow()
-    action = {
-      "action_id": req_body.get("action_id", ""),
-      "category_id": req_body.get("category_id", ""),
-      "duration": req_body.get("duration", ""),
-      "description": req_body.get("description", ""),
-      "ts": req_body.get("ts", datetime.strftime(utc_now, "%Y-%m-%d %H:%M:%S.%f")),
-    }
+    action = Action(req_body.get("action")).__dict__
 
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
@@ -58,5 +63,6 @@ def action_taken_view(req_body, res):
 
   except BaseException as e:
     res.add_error(e)
+
   finally:
     return res
