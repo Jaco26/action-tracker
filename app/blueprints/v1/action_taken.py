@@ -1,52 +1,36 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-
 from app.queries.v1 import action_taken
 from app.util.custom_api_response import with_res
-from app.util.validate_req import validate
-from app.util.validate_date_format import validate_dates
+from app.util.validations.view_decorator import validate
+from app.util.validations.schemas import date_range_schema, action_schema
 
-from app.util.req_body_types import Action
+from datetime import datetime, timedelta
 
 action_taken_bp_v1 = Blueprint('action_taken_bp_v1', __name__)
 
 @action_taken_bp_v1.route("/", methods=["GET", "POST", "PUT", "DELETE"])
 @jwt_required
 @with_res
-# @validate({
-#   'action_id': str,
-#   'category_id': str,
-#   'duration': str,
-#   'description': str,
-#   'ts': str
-# })
-@validate({
-  "action": {
-    "id": str,
-    "category_id": str,
-    "duration": str,
-    "description": str,
-    "ts": str,
-  }
-})
-def action_taken_view(req_body, res):
-  
+def action_taken_view(res):
   try:
     user_id = get_jwt_identity()
-    action = Action(req_body.get("action")).__dict__
-
-    start_date = request.args.get("start_date")
-    end_date = request.args.get("end_date")
+    action = action_schema(request.get_json()["action"]) if request.get_json() else None
+    date_range = date_range_schema(dict(request.args)) if request.args else None
 
     if request.method == "GET":
-      if start_date and end_date:
-        if validate_dates(start_date, end_date):
-          res.add_data({
-            'actions': action_taken.get_all_between_dates(user_id, start_date, end_date),
-          })
-        else:
-          raise BaseException("the dates provided were invalid. please use format YYYY-MM-DD")
+      if date_range:
+        start = date_range["start"]
+        
+        end = date_range["end"]
+        end_d = datetime.strptime(end, "%Y-%m-%d")
+        end_d_utc = end_d.utcnow()
+        print(end_d_utc)
+        print(start, end, end_d + timedelta(seconds=86399))
+        res.add_data({
+          'actions': action_taken.get_all_between_dates(user_id, date_range["start"], date_range["end"]),
+        })
       else:
         res.add_data({
           'actions': action_taken.get_all(user_id),
@@ -59,7 +43,7 @@ def action_taken_view(req_body, res):
       action_taken.update(user_id, action)
 
     elif request.method == "DELETE":
-      action_taken.delete(action["action_id"], user_id)
+      action_taken.delete(action["id"], user_id)
 
   except BaseException as e:
     res.add_error(e)

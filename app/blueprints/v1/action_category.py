@@ -3,7 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.queries.v1 import action_category
 from app.util.custom_api_response import with_res
-from app.util.validate_req import validate
+from app.util.validations.view_decorator import validate
 
 
 action_category_bp_v1 = Blueprint("action_category_bp_v1", __name__)

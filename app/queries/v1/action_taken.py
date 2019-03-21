@@ -1,18 +1,22 @@
+from datetime import datetime
 from app.db import pool
+
+def ts_utcnow():
+  d = datetime.utcnow()
+  return d.isoformat()
 
 @pool.execute()
 def create(user_id, action):
-  print(user_id)
   sql = """INSERT INTO action_taken (user_id, ts, category_id, description) 
            VALUES (%s, %s, %s, %s);"""
-  return sql, [user_id, action["ts"], action["category_id"], action["description"]]
+  return sql, [user_id, action.get("ts", ts_utcnow()), action["category_id"], action.get("description", "")]
 
 
 @pool.execute()
 def update(user_id, action):
   sql = """UPDATE action_taken SET ts = %s, category_id = %s, description = %s
            WHERE id = %s AND user_id = %s;""".format(col_to_update)
-  return sql, [action["ts"], action["category_id"], action["description"], action["action_id"], user_id]
+  return sql, [action.get("ts", ts_utcnow()), action["category_id"], action["description"], action["action_id"], user_id]
 
 
 @pool.execute()
@@ -32,7 +36,7 @@ def get_all(user_id):
 @pool.execute()
 def get_all_between_dates(user_id, d1, d2):
   sql = """SELECT * FROM action_taken 
-           WHERE user_id = %s AND date_trunc('day', ts) 
+           WHERE user_id = %s AND date_trunc('hour', ts) 
            BETWEEN %s AND %s;"""
   return sql, [user_id, d1, d2]
   
