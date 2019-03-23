@@ -1,5 +1,6 @@
 import datetime
-from flask import Blueprint
+from werkzeug.exceptions import HTTPException, default_exceptions
+from flask import Blueprint, abort
 from flask_jwt_extended import (
   jwt_required, jwt_refresh_token_required, create_access_token,
   create_refresh_token, get_jwt_identity, get_raw_jwt
@@ -50,8 +51,13 @@ def login(req_body, res):
           'refresh_token': create_refresh_token(identity=user.get("id")),
         })
         res.message = "You're logged in!"
+      else:
+        abort(403)
+    else:
+      abort(403)
   except BaseException as e:
     res.add_error(e)
+    res.status = e.code
   finally:
     return res
 

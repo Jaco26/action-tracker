@@ -19,12 +19,21 @@ class ApiResult:
     })
 
   def to_response(self):
-    return jsonify(
-      data=self.data,
-      errors=self.errors,
-      message=self.message,
+    return Response(
+      json.dumps(dict(
+        data=self.data,
+        message=self.message,
+        errors=self.errors
+      )),
       status=self.status,
+      mimetype="application/json"
     )
+    # return jsonify(
+    #   data=self.data,
+    #   errors=self.errors,
+    #   message=self.message,
+    #   status=self.status,
+    # )
 
 
 class ApiFlask(Flask):

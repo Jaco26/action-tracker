@@ -22,14 +22,14 @@ def action_taken_view(res):
     if request.method == "GET":
       if date_range:
         start = date_range["start"]
-        
+        start_d = datetime.strptime(start, "%Y-%m-%d")
         end = date_range["end"]
         end_d = datetime.strptime(end, "%Y-%m-%d")
-        end_d_utc = end_d.utcnow()
-        print(end_d_utc)
-        print(start, end, end_d + timedelta(seconds=86399))
+
+        end_end_of_day = end_d + timedelta(seconds=86399)
+        print(start_d, end_end_of_day)
         res.add_data({
-          'actions': action_taken.get_all_between_dates(user_id, date_range["start"], date_range["end"]),
+          'actions': action_taken.get_all_between_dates(user_id, start_d, end_end_of_day),
         })
       else:
         res.add_data({

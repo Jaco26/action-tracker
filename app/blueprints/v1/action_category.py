@@ -28,6 +28,7 @@ def action_category_view(req_body, res):
 
     elif request.method == "POST":
       category_name = req_body.get("category_name")
+      print('cattttttt', category_name)
       action_category.create(user_id, category_name)
       res.add_data({ 
         'action_categories': action_category.get_all(user_id) 
