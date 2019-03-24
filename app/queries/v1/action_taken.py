@@ -1,15 +1,11 @@
 from datetime import datetime
 from app.db import pool
 
-def ts_utcnow():
-  d = datetime.utcnow()
-  return d.isoformat()
-
 @pool.execute()
-def create(user_id, action):
+def insert_action_taken(user_id, action):
   sql = """INSERT INTO action_taken (user_id, ts, category_id, description) 
            VALUES (%s, %s, %s, %s);"""
-  return sql, [user_id, action.get("ts", ts_utcnow()), action["category_id"], action.get("description", "")]
+  return sql, [user_id, action["ts"], action["category_id"], action["description"]]
 
 
 @pool.execute()

@@ -1,10 +1,11 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from app.queries.v1 import action_taken
+import app.queries.v1.action_taken as db 
+
 from app.util.custom_api_response import with_res
 from app.util.validations.view_decorator import validate
-from app.util.validations.schemas import date_range_schema, action_schema
+from app.util.validations.schemas import date_range_schema, create_action_schema
 
 from datetime import datetime, timedelta
 
@@ -16,7 +17,7 @@ action_taken_bp_v1 = Blueprint('action_taken_bp_v1', __name__)
 def action_taken_view(res):
   try:
     user_id = get_jwt_identity()
-    action = action_schema(request.get_json()["action"]) if request.get_json() else None
+    # action = action_schema(request.get_json()["action"]) if request.get_json() else None
     date_range = date_range_schema(dict(request.args)) if request.args else None
 
     if request.method == "GET":
@@ -27,23 +28,23 @@ def action_taken_view(res):
         end_d = datetime.strptime(end, "%Y-%m-%d")
 
         end_end_of_day = end_d + timedelta(seconds=86399)
-        print(start_d, end_end_of_day)
         res.add_data({
-          'actions': action_taken.get_all_between_dates(user_id, start_d, end_end_of_day),
+          'actions': db.get_all_between_dates(user_id, start_d, end_end_of_day),
         })
       else:
         res.add_data({
-          'actions': action_taken.get_all(user_id),
+          'actions': db.get_all(user_id),
         })
 
     elif request.method == "POST":
-      action_taken.create(user_id, action)
+      action = create_action_schema(request.get_json()["action"])
+      db.insert_action_taken(user_id, action)
 
     elif request.method == "PUT":
-      action_taken.update(user_id, action)
+      db.update(user_id, action)
 
     elif request.method == "DELETE":
-      action_taken.delete(action["id"], user_id)
+      db.delete(action["id"], user_id)
 
   except BaseException as e:
     res.add_error(e)

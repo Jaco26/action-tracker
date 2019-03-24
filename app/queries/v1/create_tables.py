@@ -2,12 +2,13 @@ from app.db import pool
 
 @pool.execute()
 def drop_tables():
-  return """
-    DROP TABLE users CASCADE;
-    DROP TABLE revoked_token;
-    DROP TABLE action_category CASCADE;
-    DROP TABLE action_taken;
-  """
+  # return """
+  #   DROP TABLE users CASCADE;
+  #   DROP TABLE revoked_token;
+  #   DROP TABLE action_category CASCADE;
+  #   DROP TABLE action_taken;
+  # """
+  pass
 
 @pool.execute()
 def create_tables():
@@ -32,14 +33,14 @@ def create_tables():
     (
       id UUID PRIMARY KEY default uuid_generate_v4(),
       user_id UUID references users(id) NOT NULL,
-      category_name VARCHAR UNIQUE NOT NULL
+      category_name VARCHAR NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS action_taken 
     (
       id UUID PRIMARY KEY default uuid_generate_v4(),
       user_id UUID references users(id),
-      ts TIMESTAMPTZ DEFAULT timezone('utc'::text, now()),
+      ts TIMESTAMPTZ DEFAULT timezone('utc', now()),
       duration TSTZRANGE,
       category_id UUID references action_category(id) NOT NULL,
       description VARCHAR

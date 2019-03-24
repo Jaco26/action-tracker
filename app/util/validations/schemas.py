@@ -32,6 +32,12 @@ action_schema = CreateSchema({
   "duration": tstz_range_schema,
 })
 
+create_action_schema = CreateSchema({
+  Required("category_id"): UUID,
+  "description": str,
+  "ts": Date(MyFormats.timestamptz),
+})
+
 class Me:
   def __init__(self, name):
     self.name = name

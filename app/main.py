@@ -34,6 +34,10 @@ def create_app():
   app.register_blueprint(action_category_bp_v1, url_prefix="/api/v1/action-category")
   app.register_blueprint(action_taken_bp_v1, url_prefix="/api/v1/action-taken")
 
+  # @app.before_request
+  # def before():
+  #   print(request.headers)
+
   # @app.before_first_request
   # def do_before():
   #   create_tables.drop_tables()
