@@ -22,6 +22,8 @@ from .blueprints.v1.action_taken import action_taken_bp_v1
 def create_app():
   app = ApiFlask(__name__, static_folder="./templates/static")
   app.json_encoder = CustomJSONEncoder
+  app.config["DEBUG"] = False
+  app.config["ENV"] = 'production'
 
   app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
   app.config['JWT_BLACKLIST_ENABLED'] = True

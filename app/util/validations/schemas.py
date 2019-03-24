@@ -38,18 +38,6 @@ create_action_schema = CreateSchema({
   "ts": Date(MyFormats.timestamptz),
 })
 
-class Me:
-  def __init__(self, name):
-    self.name = name
-
-
-  def print_keys(self):
-    print(self.__dict__.keys())
-
-me = Me("jacob")
-
-me.print_keys()
-
 
 # time_range = CreateSchema({
 #   "start_time": "2019-03-20T17:01:42.160020Z",
@@ -61,4 +49,3 @@ me.print_keys()
 #   "end_date": "2019-03-20T23:02:10.140Z"
 # })
 
-# print(valid_range)
