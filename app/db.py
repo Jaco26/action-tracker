@@ -14,8 +14,8 @@ dotenv.load_dotenv()
 class Pool:
   def __init__(self, db_uri):
     self.pool = ThreadedConnectionPool(
-      minconn=10, 
-      maxconn=20,
+      minconn=1, 
+      maxconn=10,
       dsn=db_uri
     )
   
