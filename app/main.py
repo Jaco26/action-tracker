@@ -1,5 +1,5 @@
 import os
-from flask import Flask, jsonify, abort, request
+from flask import Flask, jsonify, abort, request, render_template
 from datetime import datetime
 
 # my utilities
@@ -20,7 +20,7 @@ from .blueprints.v1.action_category import action_category_bp_v1
 from .blueprints.v1.action_taken import action_taken_bp_v1
 
 def create_app():
-  app = ApiFlask(__name__)
+  app = ApiFlask(__name__, static_folder="./templates/static")
   app.json_encoder = CustomJSONEncoder
 
   app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
@@ -43,8 +43,9 @@ def create_app():
   #   create_tables.drop_tables()
   #   create_tables.create_tables()
 
-  @app.route("/")
-  def index():
-    return jsonify(message="Hello You!", date=datetime.now())
+  @app.route("/", defaults={'path': ''})
+  @app.route("/<path:path>")
+  def index(path):
+    return render_template("index.html")
 
   return app
