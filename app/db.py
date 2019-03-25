@@ -56,7 +56,7 @@ class Pool:
               elif cursor_method == "fetchone":
                 result = c.fetchone()
               if type(result) is list and not len(result):
-                return None
+                return []
               return result
             return True
       return wrapper

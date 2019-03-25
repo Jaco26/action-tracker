@@ -49,6 +49,7 @@ def login(req_body, res):
         res.add_data({
           'access_token': create_access_token(identity=user.get("id"), expires_delta=datetime.timedelta(seconds=7200)), # expires in 2 hours
           'refresh_token': create_refresh_token(identity=user.get("id")),
+          'username': username,
         })
         res.message = "You're logged in!"
       else:
