@@ -74,3 +74,5 @@ class Pool:
 
 
 pool = Pool(os.environ['DATABASE_URL'])
+
+# pool = Pool(os.environ['PROD_DB_URL'])
