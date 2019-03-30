@@ -47,7 +47,7 @@ def login(req_body, res):
     if user:
       if check_password_hash(user.get("pw_hash"), req_body.get("password")):
         res.add_data({
-          'access_token': create_access_token(identity=user.get("id"), expires_delta=False), # expires in 2 hours
+          'access_token': create_access_token(identity=user.get("id"), expires_delta=datetime.timedelta(days=1)), # expires in 2 hours
           'refresh_token': create_refresh_token(identity=user.get("id")),
           'username': username,
         })
