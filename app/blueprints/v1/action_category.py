@@ -38,9 +38,7 @@ def action_category_view(req_body, res, category_id=None):
       new_category_name = req_body.get("new_category_name")
       category_id = req_body.get("category_id")
       db.update_action_category(new_category_name, category_id, user_id)
-      # res.add_data({ 
-      #   'action_categories': db.select_category_by_user(user_id)
-      # })
+  
 
     elif request.method == "DELETE":
       db.delete_from_action_category(str(category_id))
