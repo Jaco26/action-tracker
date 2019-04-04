@@ -19,12 +19,12 @@ from .blueprints.v1.auth import auth_bp_v1
 from .blueprints.v1.action_category import action_category_bp_v1
 from .blueprints.v1.action_taken import action_taken_bp_v1
 
-def create_app():
+def create_app(config):
   app = ApiFlask(__name__, static_folder="./templates/static")
-  app.json_encoder = CustomJSONEncoder
 
-  app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
-  app.config['JWT_BLACKLIST_ENABLED'] = True
+  app.config.from_object(config)
+
+  app.json_encoder = CustomJSONEncoder
 
   pool.init_app(app)
   custom_error_handler.init_app(app)

@@ -12,14 +12,15 @@ dotenv.load_dotenv()
 
 
 class Pool:
-  def __init__(self, db_uri):
+  def __init__(self, ):
+    self.pool = None
+  
+  def init_app(self, app):
     self.pool = ThreadedConnectionPool(
       minconn=1, 
       maxconn=10,
-      dsn=db_uri
+      dsn=app.config["DATABASE_URL"]
     )
-  
-  def init_app(self, app):
     app.teardown_appcontext(self.return_conn)
 
   def get_conn(self):
@@ -73,6 +74,6 @@ class Pool:
     return wrapper
 
 
-pool = Pool(os.environ['DATABASE_URL'])
+pool = Pool()
 
 # pool = Pool(os.environ['PROD_DB_URL'])
