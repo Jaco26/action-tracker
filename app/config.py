@@ -6,7 +6,6 @@ class BaseConfig:
 
 
 class DevConfig(BaseConfig):
-  DEBUG = True
   DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
