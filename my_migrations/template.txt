@@ -1,0 +1,7 @@
+version = "%version_name%"
+id = "%id%"
+date_created = "%date_created%"
+
+upgrade = """%upgrade_text%"""
+
+downgrade = """%downgrade_text%"""
