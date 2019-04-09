@@ -19,7 +19,7 @@ class Pool:
     self.pool = ThreadedConnectionPool(
       minconn=1, 
       maxconn=10,
-      dsn=app["DATABASE_URL"]
+      dsn=app.config["DATABASE_URL"]
     )
     app.teardown_appcontext(self.return_conn)
 
@@ -74,6 +74,10 @@ class Pool:
     return wrapper
 
 
+<<<<<<< HEAD
+=======
+pool = Pool()
+>>>>>>> master
 
 # pool = Pool(os.environ['DATABASE_URL'])
 pool = Pool()

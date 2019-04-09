@@ -1,14 +1,13 @@
 import os
 
 class BaseConfig:
-  pass
+  JWT_SECRET_KEY = os.environ["JWT_SECRET_KEY"]
+  JWT_BLACKLIST_ENABLED = True
 
 
 class DevConfig(BaseConfig):
-  SQLALCHEMY_DATABASE_URI = os.environ["DEV_DB_URI"]
-  DATABASE_URL = os.environ["DATABASE_URL"]
-  PROD_DATABASE_URI = os.environ[""]
+  DATABASE_URL = os.environ.get("DATABASE_URL")
 
 
 class ProdConfig(BaseConfig):
-  DATABASE_URL = os.environ["DATABASE_URL"]
+  DATABASE_URL = os.environ.get("DATABASE_URL")

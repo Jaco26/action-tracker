@@ -25,7 +25,6 @@ from .blueprints.v1.action_taken import action_taken_bp_v1
 
 def create_app(config=None):
   app = ApiFlask(__name__, static_folder="./templates/static")
-  app.json_encoder = CustomJSONEncoder
 
   if config:
     app.config.from_object(config)
