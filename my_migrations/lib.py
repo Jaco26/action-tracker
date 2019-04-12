@@ -4,6 +4,7 @@ import psycopg2
 import importlib
 from datetime import datetime
 
+
 class Manager:
   def __init__(self, db_uri):
     self.db_uri = db_uri
@@ -20,6 +21,7 @@ class Manager:
       "id": uuid.uuid4().hex,
       "date_created": datetime.utcnow().isoformat(),
     })
+
     with open(f"{self.directory}/ledger.txt", "a") as ledger_f:
       ledger_f.write(options["id"] + "\n")
 
@@ -43,11 +45,6 @@ class Manager:
 
         print(module.upgrade())
         # migration_file_path = f"{self.directory}/versions/{lines[-1]}.py"
-      
-
-
-
-
 
   def downgrade(self, migration_name):
     pass
