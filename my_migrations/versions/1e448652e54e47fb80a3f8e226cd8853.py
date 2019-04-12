@@ -1,14 +1,16 @@
 version = "Jacob's version"
-id = "6602625ec8814c30a7d688e1416b75a6"
-date_created = "2019-04-07T23:40:11.223282"
+id = "1e448652e54e47fb80a3f8e226cd8853"
+date_created = "2019-04-09T23:56:58.178109"
 
-upgrade = """
+def upgrade():
+  return """
     Hi how are you;
     I am doing pretty good;
     how about you;
     """
 
-downgrade = """
+def downgrade():
+  return """
     Oh I am good too;
     It is a nice day huh;
     """

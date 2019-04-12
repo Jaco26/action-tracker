@@ -2,6 +2,8 @@ version = "%version_name%"
 id = "%id%"
 date_created = "%date_created%"
 
-upgrade = """%upgrade_text%"""
+def upgrade():
+  return """%upgrade_text%"""
 
-downgrade = """%downgrade_text%"""
+def downgrade():
+  return """%downgrade_text%"""

@@ -16,9 +16,9 @@ down = """
     """
 
 if __name__ == "__main__":
-  # manager.create_migration({
-  #   "version_name": "Jacob's version",
-  #   "upgrade_text": up,
-  #   "downgrade_text": down,
-  # })
+#   manager.create_migration({
+#     "version_name": "Jacob's version",
+#     "upgrade_text": up,
+#     "downgrade_text": down,
+#   })
   manager.execute_migration("up")

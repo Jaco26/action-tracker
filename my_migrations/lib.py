@@ -35,14 +35,13 @@ class Manager:
   def execute_migration(self, direction, migration_id=None):
     with open(f"{self.directory}/ledger.txt", "r") as ledger_f:
       if migration_id:
-        pass
-        # migration_file_path = f"{self.directory}/versions/{migration_id}.py"
+        module = importlib.import_module(f"my_migrations.versions.{migration_id}")
+        print(module.upgrade().strip())
       else:
         lines = [line.replace("\n", "") for line in ledger_f]
-        module = importlib.import_module(f"{self.directory}.versions.{migration_id}")
-        module = map(__import__, [f"versions.{migration_id}"])
+        module = importlib.import_module(f"my_migrations.versions.{lines[-1]}")
 
-        print(dir(module))
+        print(module.upgrade())
         # migration_file_path = f"{self.directory}/versions/{lines[-1]}.py"
       
 
