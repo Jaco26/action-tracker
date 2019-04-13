@@ -47,4 +47,4 @@ class Manager:
         # migration_file_path = f"{self.directory}/versions/{lines[-1]}.py"
 
   def downgrade(self, migration_name):
-pass
+    pass

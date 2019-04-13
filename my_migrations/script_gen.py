@@ -5,6 +5,25 @@ class ScriptGen:
     self.up = [] # append upgrade statements here
     self.down = [] # append inverse, downgrade statements here
 
+  # CREATE TABLE IF NOT EXISTS
+  def create_table_if_not_exists(self, tablename, only_return=False, *rows):
+    stmt = f"CREATE TABLE IF NOT EXISTS {tablename} ("
+    for row in rows:
+      stmt += row
+    stmt += ");"
+    if not only_return and stmt not in self.up:
+      self.up.append(stmt)
+      self.down.append(self.drop_table(tablename, True))
+    return stmt
+
+  # DROP TABLE
+  def drop_table(self, tablename, only_return=False):
+    stmt = f"DROP TABLE {tablename};"
+    if not only_return and stmt not in self.up:
+      self.up.append(stmt)
+      self.down.append(self.create_table_if_not_exists(tablename, True, "<<DEFINITION NEEDED>>"))
+    return stmt
+
   # ALTER TABLE
   def alter_table(self, tablename):
     altr_tbl = f"ALTER TABLE {tablename}"
