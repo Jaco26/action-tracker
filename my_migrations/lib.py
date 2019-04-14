@@ -13,6 +13,7 @@ class Manager:
 
   def __init__(self, db_uri):
     self.db_uri = db_uri
+    self.db_name = db_uri[db_uri.rfind("/") + 1:]
     self.directory = os.path.dirname(os.path.abspath(__file__))
 
   def execute_sql(self, sql):
@@ -59,10 +60,10 @@ class Manager:
     with open(f"{self.directory}/{filename}", "r") as file:
       return file.read()
 
-  def print_ledger(self):
+  def versions(self):
     print(self.get_file_text("ledger.txt"))
   
-  def print_history(self):
+  def logs(self):
     print(self.get_file_text("history.txt"))
      
   def get_ledger_item(self, migration_id=None):
@@ -78,51 +79,37 @@ class Manager:
     return importlib.import_module(f"my_migrations.versions.{migration_id}")
   
   def migration_has_been_executed(self, migration_id="", direction=""):
-    search_pattern = "(migration <" + migration_id + "> " + direction + " executed: .+)"
+    search_pattern = f"(migration <{migration_id}> {direction} executed on db <{self.db_name}>: .+)"
     return bool(re.search(search_pattern, self.get_file_text("history.txt")))
     
-  def upgrade(self, migration_id=None):
+  def do_the_thing(self, migration_id=None, direction=""):
+    if direction != "UPGRADE" and direction != "DOWNGRADE":
+      print("<direction> must equal either 'UPGRADE' or 'DOWNGRADE'")
+      return
     try:
       if not migration_id:
         migration_ledger_item = self.get_ledger_item(migration_id=None)
         migration_id = migration_ledger_item["id"]
-      if self.migration_has_been_executed(migration_id, "UPGRADE"):
-        answer = input(f"an UPGRADE on migration <{migration_id}> has previously been executed. Do you wish to continue? [y/n]")
+      if self.migration_has_been_executed(migration_id, direction):
+        answer = input(f"an {direction} on migration <{migration_id}> has previously been executed on database <{self.db_name}>. Do you wish to continue? [y/n]")
         if answer.lower() == "y":
           pass
         else:
-          print("Aborting")
+          print("Aborting...")
           return
       script_module = self.get_migration_script_module(migration_id)
       if script_module:
-        sql_text = script_module.upgrade()
-        # self.execute_sql(sql_text)
-        self.write_history(f"migration <{migration_id}> UPGRADE executed: {datetime.utcnow().isoformat()}\n")
-        print("UPGRADE successful")
+        sql_text = script_module.upgrade() if direction == "UPGRADE" else script_module.downgrade()
+        self.execute_sql(sql_text)
+        self.write_history(f"migration <{migration_id}> {direction} executed on db <{self.db_name}>: {datetime.utcnow().isoformat()}\n")
+        print(f"{direction} successful")
       else:
         print(f"No script module found for migration_id <{migration_id}>")
     except BaseException as e:
-      print("UPGRADE FAILED", e)
+      print(f"{direction} FAILED", e)
+
+  def upgrade(self, migration_id=None):
+    self.do_the_thing(migration_id, "UPGRADE")
 
   def downgrade(self, migration_id=None):
-    try:
-      if not migration_id:
-        migration_ledger_item = self.get_ledger_item(migration_id=None)
-        migration_id = migration_ledger_item["id"]
-      if self.migration_has_been_executed(migration_id, "UPGRADE"):
-        answer = input(f"an UPGRADE on migration <{migration_id}> has previously been executed. Do you wish to continue? [y/n]")
-        if answer.lower() == "y":
-          pass
-        else:
-          print("Aborting")
-          return
-      script_module = self.get_migration_script_module(migration_id)
-      if script_module:
-        sql_text = script_module.downgrade()
-        # self.execute_sql(sql_text)
-        self.write_history(f"migration <{migration_id}> DOWNGRADE executed: {datetime.utcnow().isoformat()}\n")
-        print("DOWNGRADE successful")
-      else:
-        print(f"No script module found for migration_id <{migration_id}>")
-    except BaseException as e:
-      print("DOWNGRADE FAILED", e)
+    self.do_the_thing(migration_id, "DOWNGRADE")
