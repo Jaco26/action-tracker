@@ -9,7 +9,7 @@ from datetime import datetime
 
 class Manager:
 
-  ledger_sect_re = re.compile("---\nid:\s*(?P<id>.+)\ndate:\s*(?P<date>.+)\ndescription:\s*(?P<description>.+)\n---")
+  ledger_sect_re = re.compile(r"---\nid:\s*(?P<id>.+)\ndate:\s*(?P<date>.+)\ndescription:\s*(?P<description>.+)\n---")
 
   def __init__(self, db_uri):
     self.db_uri = db_uri
@@ -53,39 +53,76 @@ class Manager:
       ledger_f.write(f"description: {description}\n")
       ledger_f.write("-----" * 9 + "\n")
     
-    self.write_history(f"migration <{meta['id']}> created: {meta['date_created']}\n")
+    self.write_history(f"migration <{meta['id']}> CREATED: {meta['date_created']}\n")
 
-  def read_ledger(self):
-    with open(f"{self.directory}/ledger.txt", "r") as ledger_f:
-      print(ledger_f.read())
+  def get_file_text(self, filename):
+    with open(f"{self.directory}/{filename}", "r") as file:
+      return file.read()
+
+  def print_ledger(self):
+    print(self.get_file_text("ledger.txt"))
   
-  def read_history(self):
-    with open(f"{self.directory}/history.txt", "r") as history_f:
-      print(history_f.read())
+  def print_history(self):
+    print(self.get_file_text("history.txt"))
      
   def get_ledger_item(self, migration_id=None):
-    with open(f"{self.directory}/ledger.txt", "r") as ledger_f:
-      ledger_str = ledger_f.read()
-      migrations = [m.groupdict() for m in self.ledger_sect_re.finditer(ledger_str)]
-      if migration_id:
-        the_migration = (next(iter(m for m in migrations if m["id"] == migration_id), None))
-      else:
-        the_migration = (migrations[-1])
-      return the_migration
+    ledger_str = self.get_file_text("ledger.txt")
+    migrations = [m.groupdict() for m in self.ledger_sect_re.finditer(ledger_str)]
+    if migration_id:
+      the_migration = (next(iter(m for m in migrations if m["id"] == migration_id), None))
+    else:
+      the_migration = (migrations[-1])
+    return the_migration
 
   def get_migration_script_module(self, migration_id):
     return importlib.import_module(f"my_migrations.versions.{migration_id}")
+  
+  def migration_has_been_executed(self, migration_id="", direction=""):
+    search_pattern = "(migration <" + migration_id + "> " + direction + " executed: .+)"
+    return bool(re.search(search_pattern, self.get_file_text("history.txt")))
     
   def upgrade(self, migration_id=None):
-    if not migration_id:
-      migration_ledger_item = self.get_ledger_item(migration_id=None)
-      migration_id = migration_ledger_item["id"]
-    script_module = self.get_migration_script_module(migration_id)
-    print(script_module.upgrade())
+    try:
+      if not migration_id:
+        migration_ledger_item = self.get_ledger_item(migration_id=None)
+        migration_id = migration_ledger_item["id"]
+      if self.migration_has_been_executed(migration_id, "UPGRADE"):
+        answer = input(f"an UPGRADE on migration <{migration_id}> has previously been executed. Do you wish to continue? [y/n]")
+        if answer.lower() == "y":
+          pass
+        else:
+          print("Aborting")
+          return
+      script_module = self.get_migration_script_module(migration_id)
+      if script_module:
+        sql_text = script_module.upgrade()
+        # self.execute_sql(sql_text)
+        self.write_history(f"migration <{migration_id}> UPGRADE executed: {datetime.utcnow().isoformat()}\n")
+        print("UPGRADE successful")
+      else:
+        print(f"No script module found for migration_id <{migration_id}>")
+    except BaseException as e:
+      print("UPGRADE FAILED", e)
 
   def downgrade(self, migration_id=None):
-    if not migration_id:
-      migration_ledger_item = self.get_ledger_item(migration_id=None)
-      migration_id = migration_ledger_item["id"]
-    script_module = self.get_migration_script_module(migration_id)
-    print(script_module.downgrade())
+    try:
+      if not migration_id:
+        migration_ledger_item = self.get_ledger_item(migration_id=None)
+        migration_id = migration_ledger_item["id"]
+      if self.migration_has_been_executed(migration_id, "UPGRADE"):
+        answer = input(f"an UPGRADE on migration <{migration_id}> has previously been executed. Do you wish to continue? [y/n]")
+        if answer.lower() == "y":
+          pass
+        else:
+          print("Aborting")
+          return
+      script_module = self.get_migration_script_module(migration_id)
+      if script_module:
+        sql_text = script_module.downgrade()
+        # self.execute_sql(sql_text)
+        self.write_history(f"migration <{migration_id}> DOWNGRADE executed: {datetime.utcnow().isoformat()}\n")
+        print("DOWNGRADE successful")
+      else:
+        print(f"No script module found for migration_id <{migration_id}>")
+    except BaseException as e:
+      print("DOWNGRADE FAILED", e)
