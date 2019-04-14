@@ -33,9 +33,10 @@ script.create_table_if_not_exists("action_taken", False,
 )
 
 if __name__ == "__main__":
-  manager.create_migration(
-      description="This is my the database schema as it exists in version 1 of the app.",
-      up_text="".join(script.up),
-      down_text="".join(script.down)
-  )
+    pass
+#   manager.create_migration(
+#       description="This is my the database schema as it exists in version 1 of the app.",
+#       up_text="".join(script.up),
+#       down_text="".join(script.down)
+#   )
 

@@ -6,4 +6,4 @@ def upgrade():
   return """%upgrade_text%"""
 
 def downgrade():
-return """%downgrade_text%"""
+  return """%downgrade_text%"""

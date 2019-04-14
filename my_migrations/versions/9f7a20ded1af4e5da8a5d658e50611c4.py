@@ -1,6 +1,6 @@
 description = "This is my the database schema as it exists in version 1 of the app."
-id = "7075c3c52304425486a5fad8ba547e24"
-date_created = "2019-04-14T02:30:38.380860"
+id = "9f7a20ded1af4e5da8a5d658e50611c4"
+date_created = "2019-04-14T16:54:13.318511"
 
 def upgrade():
   return """
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS action_taken (
 """
 
 def downgrade():
-return """
+	return """
 DROP EXTENSION "uuid-ossp";
 
 DROP TABLE revoked_token;
