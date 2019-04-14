@@ -16,22 +16,33 @@ class Manager:
         c.execute(sql)
     conn.close()
 
-  def create_migration(self, options):
-    options.update({
+  def create_migration(self, description, up_text, down_text):
+    meta = {
       "id": uuid.uuid4().hex,
       "date_created": datetime.utcnow().isoformat(),
-    })
+    }
 
     with open(f"{self.directory}/ledger.txt", "a") as ledger_f:
-      ledger_f.write(options["id"] + "\n")
+      ledger_f.write("\n")
+      ledger_f.write("-----" * 9 + "\n")
+      ledger_f.write(f"id:          {meta['id']}\n")
+      ledger_f.write(f"date:        {meta['date_created']}\n")
+      ledger_f.write(f"description: {description}\n")
+      ledger_f.write("-----" * 9 + "\n")
 
     with open(f"{self.directory}/template.txt", "r") as template_f:
-      with open(f"{self.directory}/versions/{options['id']}.py", "w") as target_f:
+      with open(f"{self.directory}/versions/{meta['id']}.py", "w") as target_f:
+        # Read template file into string
         template_str = template_f.read()
-        for key in options.keys():
-          print(key, template_str)
-          template_str = template_str.replace(f"%{key}%", options[key])
+        # Replace appropriate items in the template string
+        template_str = template_str.replace("%description%", description)
+        template_str = template_str.replace("%id%", meta["id"])
+        template_str = template_str.replace("%date_created%", meta["date_created"])
+        template_str = template_str.replace("%upgrade_text%", up_text)
+        template_str = template_str.replace("%downgrade_text%", down_text)
+        # write updated template string to target file
         target_f.write(template_str)
+
 
 
   def execute_migration(self, direction, migration_id=None):

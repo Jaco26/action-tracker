@@ -1,4 +1,4 @@
-version = "%version_name%"
+description = "%description%"
 id = "%id%"
 date_created = "%date_created%"
 

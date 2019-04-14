@@ -7,10 +7,10 @@ class ScriptGen:
 
   # CREATE TABLE IF NOT EXISTS
   def create_table_if_not_exists(self, tablename, only_return=False, *rows):
-    stmt = f"CREATE TABLE IF NOT EXISTS {tablename} ("
+    stmt = f"\nCREATE TABLE IF NOT EXISTS {tablename} (\n"
     for row in rows:
-      stmt += row
-    stmt += ");"
+      stmt += "\t" + row + "\n"
+    stmt += ");\n"
     if not only_return and stmt not in self.up:
       self.up.append(stmt)
       self.down.append(self.drop_table(tablename, True))
@@ -18,19 +18,35 @@ class ScriptGen:
 
   # DROP TABLE
   def drop_table(self, tablename, only_return=False):
-    stmt = f"DROP TABLE {tablename};"
+    stmt = f"\nDROP TABLE {tablename};\n"
     if not only_return and stmt not in self.up:
       self.up.append(stmt)
       self.down.append(self.create_table_if_not_exists(tablename, True, "<<DEFINITION NEEDED>>"))
     return stmt
+  
+  # CREATE EXTENSION IF NOT EXISTS
+  def create_extension_if_not_exists(self, extension_name, only_return=False):
+    stmt = f"\nCREATE EXTENSION IF NOT EXISTS \"{extension_name}\";\n"
+    if not only_return and stmt not in self.up:
+      self.up.append(stmt)
+      self.down.append(self.drop_extension(extension_name, True))
+    return stmt
+
+  # DROP EXTENSION
+  def drop_extension(self, extension_name, only_return=False):
+    stmt = f"\nDROP EXTENSION \"{extension_name}\";\n"
+    if not only_return and stmt not in self.up:
+      self.up.append(stmt)
+      self.down.append(self.create_extension_if_not_exists(extension_name, True))
+    return stmt
 
   # ALTER TABLE
   def alter_table(self, tablename):
-    altr_tbl = f"ALTER TABLE {tablename}"
+    altr_tbl = f"\nALTER TABLE {tablename}"
 
     # ADD COLUMN
     def add_col(colname, coltype, only_return=False):
-      stmt = f"{altr_tbl} ADD COLUMN {colname} {coltype};"
+      stmt = f"{altr_tbl} ADD COLUMN {colname} {coltype};\n"
       if not only_return and stmt not in self.up:
         self.up.append(stmt)
         self.down.append(drop_col(colname, True))
@@ -38,7 +54,7 @@ class ScriptGen:
 
     # DROP COLUMN
     def drop_col(colname, only_return=False):
-      stmt = f"{altr_tbl} DROP COLUMN {colname};"
+      stmt = f"{altr_tbl} DROP COLUMN {colname};\n"
       if not only_return and stmt not in self.up:
         self.up.append(stmt)
         self.down.append(add_col(colname, "<<DEFINITION NEEDED>>", True))
@@ -46,7 +62,7 @@ class ScriptGen:
 
     # RENAME COLUMN
     def rename_col(colname, new_colname, only_return=False):
-      stmt = f"{altr_tbl} RENAME COLUMN {colname} TO {new_colname};"
+      stmt = f"{altr_tbl} RENAME COLUMN {colname} TO {new_colname};\n"
       if not only_return and stmt not in self.up:
         self.up.append(stmt)
         self.down.append(rename_col(new_colname, colname, True))
@@ -58,7 +74,7 @@ class ScriptGen:
       
       # SET DEFAULT
       def set_default(value, only_return=False):
-        stmt = f"{altr_clm} SET DEFAULT {value};"
+        stmt = f"{altr_clm} SET DEFAULT {value};\n"
         if not only_return and stmt not in self.up:
           self.up.append(stmt)
           self.down.append(drop_default(True))
@@ -66,7 +82,7 @@ class ScriptGen:
     
       # DROP DEFAULT
       def drop_default(only_return=False):
-        stmt = f"{altr_clm} DROP DEFAULT;"
+        stmt = f"{altr_clm} DROP DEFAULT;\n"
         if not only_return and stmt not in self.up:
           self.up.append(stmt)
           self.down.append(set_default("<<DEFINITION NEEDED>>", True))
@@ -74,7 +90,7 @@ class ScriptGen:
 
       # SET NOT NULL
       def set_not_null(only_return=False):
-        stmt = f"{altr_clm} SET NOT NULL;"
+        stmt = f"{altr_clm} SET NOT NULL;\n"
         if not only_return and stmt not in self.up:
           self.up.append(stmt)
           self.down.append(drop_not_null(True))
@@ -82,7 +98,7 @@ class ScriptGen:
 
       # DROP NOT NULL
       def drop_not_null(only_return=False):
-        stmt = f"{altr_clm} DROP NOT NULL;"
+        stmt = f"{altr_clm} DROP NOT NULL;\n"
         if not only_return and stmt not in self.up:
           self.up.append(stmt)
           self.down.append(set_not_null(True))
@@ -99,7 +115,7 @@ class ScriptGen:
 
     # ADD CONSTRAINT
     def add_constraint(constraint_name, constraint_definition, only_return=False):
-      stmt = f"{altr_tbl} ADD CONSTRAINT {constraint_name} {constraint_definition};"
+      stmt = f"{altr_tbl} ADD CONSTRAINT {constraint_name} {constraint_definition};\n"
       if not only_return and stmt not in self.up:
         self.up.append(stmt)
         self.down.append(drop_constraint(constraint_name, True))
@@ -107,7 +123,7 @@ class ScriptGen:
 
     # DROP CONSTRAINT
     def drop_constraint(constraint_name, only_return=False):
-      stmt = f"{altr_tbl} DROP CONSTRAINT {constraint_name};"
+      stmt = f"{altr_tbl} DROP CONSTRAINT {constraint_name};\n"
       if not only_return and stmt not in self.up:
         self.up.append(stmt)
         self.down.append(add_constraint(constraint_name, "<<DEFINITION NEEDED>>", True))
@@ -115,7 +131,7 @@ class ScriptGen:
 
     # RENAME TO
     def rename_to(new_tablename, only_return=False):
-      stmt = f"{altr_tbl} RENAME TO {new_tablename};"
+      stmt = f"{altr_tbl} RENAME TO {new_tablename};\n"
       if not only_return and stmt not in self.up:
         self.up.append(stmt)
         self.down.append(rename_to(new_tablename, tablename, True))

@@ -1,0 +1,6 @@
+
+---------------------------------------------
+id:          7075c3c52304425486a5fad8ba547e24
+date:        2019-04-14T02:30:38.380860
+description: This is my the database schema as it exists in version 1 of the app.
+---------------------------------------------
