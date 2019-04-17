@@ -1,5 +1,5 @@
 import functools
-from flask import Flask, Response, jsonify, json
+from flask import Flask, Response, json
 
 
 class ApiResult:
@@ -28,12 +28,6 @@ class ApiResult:
       status=self.status,
       mimetype="application/json"
     )
-    # return jsonify(
-    #   data=self.data,
-    #   errors=self.errors,
-    #   message=self.message,
-    #   status=self.status,
-    # )
 
 
 class ApiFlask(Flask):

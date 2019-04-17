@@ -39,13 +39,3 @@ create_action_schema = CreateSchema({
 })
 
 
-# time_range = CreateSchema({
-#   "start_time": "2019-03-20T17:01:42.160020Z",
-#   "end_time": "2019-03-20T23:02:10.140Z"
-# })
-
-# valid_range= date_range({
-#   'start_date': '2018-2-28',
-#   "end_date": "2019-03-20T23:02:10.140Z"
-# })
-

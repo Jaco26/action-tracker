@@ -17,7 +17,6 @@ action_taken_bp_v1 = Blueprint('action_taken_bp_v1', __name__)
 def action_taken_view(res):
   try:
     user_id = get_jwt_identity()
-    # action = action_schema(request.get_json()["action"]) if request.get_json() else None
     date_range = date_range_schema(dict(request.args)) if request.args else None
 
     if request.method == "GET":
