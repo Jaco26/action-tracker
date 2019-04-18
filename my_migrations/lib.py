@@ -33,6 +33,12 @@ class Manager:
       "date_created": datetime.utcnow().isoformat(),
     }
 
+    if type(up_text) is list:
+      up_text = "".join(up_text)
+
+    if type(down_text) is list:
+      down_text = "".join(down_text)
+      
     with open(f"{self.directory}/template.txt", "r") as template_f:
       with open(f"{self.directory}/versions/{meta['id']}.py", "w") as target_f:
         # Read template file into string

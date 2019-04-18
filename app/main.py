@@ -11,9 +11,6 @@ from .util import jwt
 # database threaded connection pool
 from .db import pool
 
-# some sql scripts to create tables
-from .queries.v1 import create_tables
-
 # blueprints
 from .blueprints.v1.auth import auth_bp_v1
 from .blueprints.v1.action_category import action_category_bp_v1
@@ -33,15 +30,6 @@ def create_app(config):
   app.register_blueprint(auth_bp_v1, url_prefix="/api/v1/auth")
   app.register_blueprint(action_category_bp_v1, url_prefix="/api/v1/action-category")
   app.register_blueprint(action_taken_bp_v1, url_prefix="/api/v1/action-taken")
-
-  # @app.before_request
-  # def before():
-  #   print(request.headers)
-
-  # @app.before_first_request
-  # def do_before():
-  #   create_tables.drop_tables()
-  #   create_tables.create_tables()
 
   @app.route("/", defaults={'path': ''})
   @app.route("/<path:path>")
