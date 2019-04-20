@@ -29,6 +29,7 @@ def action_taken_view(res):
         end = date_range["end"]
         end_d = datetime.strptime(end, "%Y-%m-%d")
 
+
         end_end_of_day = end_d + timedelta(seconds=86399)
         res.add_data({
           'actions': db.get_all_between_dates(user_id, start_d, end_end_of_day),
@@ -40,12 +41,10 @@ def action_taken_view(res):
 
     elif request.method == "POST":
       action = ReqSchema.new_action(request.get_json())
-      # print("action", action)
-      print("do_insert", do_insert("action_taken", {
+      do_insert("action_taken", {
         "user_id": user_id,
         **action
-      }))
-      # db.insert_action_taken(user_id, action)
+      })
 
     elif request.method == "PUT":
       db.update(user_id, action)
