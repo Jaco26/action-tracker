@@ -8,5 +8,5 @@ description: This is my the database schema as it exists in version 1 of the app
 ---------------------------------------------
 id:          68a8ba16b0b548d0a3027309747810bc
 date:        2019-04-18T00:58:04.563264
-description: in 'action_taken', add column 'time_submitted' to log when record was inserted and rename column 'ts' to 'ts_override' to capture if users save an entry some time after they did an action and want to capture the time of action
+description: in 'action_taken', add column 'ts_override' to capture if users save an entry some time after they did an action and want to capture the time of action
 ---------------------------------------------

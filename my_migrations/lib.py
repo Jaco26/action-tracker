@@ -106,9 +106,15 @@ class Manager:
       script_module = self.get_migration_script_module(migration_id)
       if script_module:
         sql_text = script_module.upgrade() if direction == "UPGRADE" else script_module.downgrade()
-        self.execute_sql(sql_text)
-        self.write_history(f"migration <{migration_id}> {direction} executed on db <{self.db_name}>: {datetime.utcnow().isoformat()}\n")
-        print(f"{direction} successful")
+        print(sql_text)
+        answer = input(f"Do you wish to continue with the above migration on database <{self.db_name}>? [y/n]")
+        if answer.lower() == "y":
+          self.execute_sql(sql_text)
+          self.write_history(f"migration <{migration_id}> {direction} executed on db <{self.db_name}>: {datetime.utcnow().isoformat()}\n")
+          print(f"{direction} successful")
+        else:
+          print("Aborting...")
+          return
       else:
         print(f"No script module found for migration_id <{migration_id}>")
     except BaseException as e:

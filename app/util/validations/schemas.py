@@ -1,6 +1,5 @@
 from voluptuous import Schema, All, Required, Date, REMOVE_EXTRA
 
-from datetime import datetime
 from app.util.validations.custom_validators import UUID
 
 
