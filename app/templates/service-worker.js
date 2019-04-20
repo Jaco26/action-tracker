@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.995a0876ebeec206b3f587f00596e4af.js"
+  "/precache-manifest.28c43e107ae68fd4048b04e250a59660.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "health-action-tracker-frontend"});
