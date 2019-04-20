@@ -76,4 +76,37 @@ class Pool:
 
 pool = Pool()
 
-# pool = Pool(os.environ['PROD_DB_URL'])
+
+@pool.execute()
+def do_insert(tablename="", insert_data={}):
+  keys = insert_data.keys()
+  colnames = ", ".join([f"{colname}" for colname in keys])
+  colvalues = ", ".join([f"%({colname})s" for colname in keys])
+  
+  sql = f"INSERT INTO {tablename} ({colnames}) VALUES ({colvalues});"
+  values = { key: insert_data[key] for key in keys }
+ 
+  return sql, values
+
+@pool.execute()
+def do_update(tablename="", update_data={}, condition="", condition_data=None):
+  keys = update_data.keys()
+  update_cols = ", ".join([f"{colname} = %({colname})s" for colname in keys])
+  all_values = { **update_data, **condition_data } if condition_data else data_to_update
+
+  sql = f"UPDATE {tablename} SET {update_cols} WHERE {condition};"
+  values = { key: all_values[key] for key in all_values.keys() }
+
+  return sql, values
+
+@pool.execute()
+def do_delete(tablename="", condition="", condition_data={}):
+  sql = f"DELETE FROM {tablename} WHERE {condition};"
+  values = { key: condition_data[key] for key in condition_data.keys() }
+
+  return sql, values
+
+@pool.execute()
+def do_select(sql, values):
+  return sql, values
+

@@ -40,3 +40,14 @@ class ReqSchema:
       "duration": cls.tstz_range,
     }, extra=REMOVE_EXTRA))
 
+  @classmethod
+  def action_update(cls, source):
+    return json_from(source, Schema({
+      Required("id"): CustomValidators.UUID,
+      "user_id": CustomValidators.UUID,
+      "category_id": CustomValidators.UUID,
+      "description": str,
+      "ts_override": Date(DateFormats.timestamptz),
+      "duration": cls.tstz_range,
+    }, extra=REMOVE_EXTRA))
+

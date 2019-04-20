@@ -1,14 +1,11 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-import app.queries.v1.action_taken as db 
-from app.queries.v1.action_taken import do_insert
+from app.queries.v1 import action_taken
+from app.db import do_select, do_insert, do_update, do_delete
 
 from app.util.custom_api_response import with_res
-from app.util.validations.view_decorator import validate
-# from app.util.validations.schemas import date_range_schema, create_action_schema
 from app.util.request_schemas import ReqSchema
-
 
 from datetime import datetime, timedelta
 
@@ -32,25 +29,42 @@ def action_taken_view(res):
 
         end_end_of_day = end_d + timedelta(seconds=86399)
         res.add_data({
-          'actions': db.get_all_between_dates(user_id, start_d, end_end_of_day),
+          'actions': action_taken.get_all_between_dates(user_id, start_d, end_end_of_day),
         })
       else:
         res.add_data({
-          'actions': db.get_all(user_id),
+          'actions': action_taken.get_all(user_id),
         })
 
     elif request.method == "POST":
       action = ReqSchema.new_action(request.get_json())
-      do_insert("action_taken", {
-        "user_id": user_id,
-        **action
-      })
+      do_insert(
+        tablename="action_taken", 
+        insert_data={
+          "user_id": user_id,
+          **action,
+        }
+      )
 
     elif request.method == "PUT":
-      db.update(user_id, action)
+      action = ReqSchema.action_update(request.get_json())
+      do_update(
+        tablename="action_taken", 
+        update_data=action, 
+        condition="id = %(id)s AND user_id = %(user_id)s",
+        condition_data={ "user_id": user_id }
+      )
 
     elif request.method == "DELETE":
-      db.delete(action["id"], user_id)
+      action = ReqSchema.action_update(request.get_json())
+      do_delete(
+        tablename="action_taken", 
+        condition="id = %(id)s AND user_id = %(user_id)s", 
+        condition_data={ 
+          "id": action["id"],
+          "user_id": user_id,
+        }  
+      )
 
   except BaseException as e:
     res.add_error(e)
