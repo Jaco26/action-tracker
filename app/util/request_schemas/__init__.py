@@ -5,25 +5,38 @@ class DateFormats:
   date = "%Y-%m-%d"
   timestamptz = "%Y-%m-%dT%H:%M:%S.%f%z"
 
+
 class CustomValidators:
   UUID = lambda val: str(uuid.UUID(val))
 
 
+def json_from(source, schema):
+  return schema(dict(source)) if source else None
+
+
 class ReqSchema:
-  tstz_range = Schema({
-    Required("start"): Date(DateFormats.timestamptz),
-    Required("end"): Date(DateFormats.timestamptz),
-  }, REMOVE_EXTRA)
 
-  date_range = Schema({
-    Required("start"): Date(DateFormats.timestamptz),
-    Required("end"): Date(DateFormats.timestamptz),
-  }, REMOVE_EXTRA)
+  @classmethod
+  def tstz_range(cls, source):
+    return json_from(source, Schema({
+      Required("start"): Date(DateFormats.timestamptz),
+      Required("end"): Date(DateFormats.timestamptz),
+    }, extra=REMOVE_EXTRA))
 
-  new_action = Schema({
-    Required("id"): CustomValidators.UUID,
-    Required("category_id"): CustomValidators.UUID,
-    "description": str,
-    "ts_override": Date(DateFormats.timestamptz),
-    "duration": ReqSchema.tstz_range
-  }, REMOVE_EXTRA)
+  @classmethod
+  def date_range(cls, source):
+    return json_from(source, Schema({
+      Required("start"): Date(DateFormats.date),
+      Required("end"): Date(DateFormats.date),
+    }, extra=REMOVE_EXTRA))
+
+  @classmethod
+  def new_action(cls, source):
+    return json_from(source, Schema({
+      Required("id"): CustomValidators.UUID,
+      Required("category_id"): CustomValidators.UUID,
+      "description": str,
+      "ts_override": Date(DateFormats.timestamptz),
+      "duration": cls.tstz_range,
+    }, extra=REMOVE_EXTRA))
+

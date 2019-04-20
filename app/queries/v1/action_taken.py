@@ -1,6 +1,15 @@
 from datetime import datetime
 from app.db import pool
 
+def do_insert(tablename, data):
+  keys = data.keys()
+  colnames = ", ".join([f"{colname}" for colname in keys])
+  colvalues = ", ".join([f"%({colname})s" for colname in keys])
+  sql = f"INSERT INTO {tablename} ({colnames}) VALUES ({colvalues});"
+  values = { key: data[key] for key in keys }
+  return sql, values
+
+
 @pool.execute()
 def insert_action_taken(user_id, action):
   sql = """INSERT INTO action_taken (user_id, ts, category_id, description) 
