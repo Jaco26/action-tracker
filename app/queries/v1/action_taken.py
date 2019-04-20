@@ -3,7 +3,7 @@ from app.db import pool
 
 @pool.execute()
 def get_all(user_id):
-  sql = """SELECT ac.category_name, at.description, at.ts, at.id 
+  sql = """SELECT ac.category_name, at.description, at.ts, at.ts_override, at.id 
            FROM action_taken AS at JOIN action_category AS ac 
            ON at.category_id = ac.id 
            WHERE at.user_id = %s;"""

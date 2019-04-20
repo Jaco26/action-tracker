@@ -33,7 +33,6 @@ class ReqSchema:
   @classmethod
   def new_action(cls, source):
     return json_from(source, Schema({
-      Required("user_id"): CustomValidators.UUID,
       Required("category_id"): CustomValidators.UUID,
       "description": str,
       "ts_override": Date(DateFormats.timestamptz),
