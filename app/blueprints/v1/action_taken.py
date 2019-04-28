@@ -42,34 +42,31 @@ def action_taken_view(res):
       action.update({ "user_id": user_id })
       duration = action.get("duration")
       if duration:
-        data = {
-          "duration": DateTimeTZRange(duration["start_time"], duration["end_time"]),
-          **{ key: action[key] for key in action.keys() if key != "duration" } 
-        }
-        Query.do_insert("action_taken", data=data)
-      else:
-        Query.do_insert("action_taken", data=action)
+        action.update({
+          "duration": DateTimeTZRange(duration["start_time"], duration["end_time"])
+        })
+      Query.do_insert("action_taken", data=action)
       res.status = 201
    
 
     elif request.method == "PUT":
       action = ReqSchema.action_update(request.get_json())
-      do_update(
-        tablename="action_taken", 
-        update_data=action, 
-        condition="id = %(id)s AND user_id = %(user_id)s",
-        condition_data={ "user_id": user_id }
+      if action.get("duration"):
+        action.update({
+          "duration": DateTimeTZRange(action["duration"]["start_time"], action["duration"]["end_time"])
+        })
+      Query.do_update(
+        "action_taken", 
+        update_data={ key: action[key] for key in action.keys() if key != "id" }, 
+        condition_data={ "id": action["id"] }
       )
+      res.status = 201
 
     elif request.method == "DELETE":
-      action = ReqSchema.action_update(request.get_json())
-      do_delete(
-        tablename="action_taken", 
-        condition="id = %(id)s AND user_id = %(user_id)s", 
-        condition_data={ 
-          "id": action["id"],
-          "user_id": user_id,
-        }  
+      action = ReqSchema.action_update(request.args)
+      Query.do_delete(
+        "action_taken", 
+        condition_data={ "id": action["id"], "user_id": user_id }
       )
 
   except BaseException as e:

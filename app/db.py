@@ -95,37 +95,35 @@ class Query:
 
     return sql, values
 
+  @classmethod
+  @pool.execute()
+  def do_update(cls, tablename="", update_data={}, condition_data={}, update_text=None, condition_text=None):
+    update_keys = update_data.keys()
+    condition_keys = condition_data.keys()
+
+    all_values = { **update_data, **condition_data }
+
+    if not update_text:
+      colnames_text = ", ".join([f"{colname} = %({colname})s" for colname in update_keys])
+
+    if not condition_text:
+      condition_text = " AND ".join([f"{condition_key} = %({condition_key})s" for condition_key in condition_keys])
+
+    sql = f"UPDATE {tablename} SET {colnames_text} WHERE {condition_text};"
+    values = { key: all_values[key] for key in all_values.keys() }
+
+    return sql, values
+
+  @classmethod
+  @pool.execute()
+  def do_delete(cls, tablename="", condition_data={}, condition_text=None):
+    condition_keys = condition_data.keys()
+
+    if not condition_text:
+      condition_text = " AND ".join([f"{condition_key} = %({condition_key})s" for condition_key in condition_keys])
+
+    sql = f"DELETE FROM {tablename} WHERE {condition_text};"
+    values = { key: condition_data[key] for key in condition_keys }
+
+    return sql, values
       
-
-@pool.execute()
-def do_insert(tablename="", insert_data={}):
-  keys = insert_data.keys()
-  colnames = ", ".join([f"{colname}" for colname in keys])
-  colvalues = ", ".join([f"%({colname})s" for colname in keys])
-  sql = f"INSERT INTO {tablename} ({colnames}) VALUES ({colvalues});"
-  values = { key: insert_data[key] for key in keys }
- 
-  return sql, values
-
-@pool.execute()
-def do_update(tablename="", duration=None, update_data={}, condition="", condition_data=None):
-  keys = update_data.keys()
-  update_cols = ", ".join([f"{colname} = %({colname})s" for colname in keys])
-  all_values = { **update_data, **condition_data } if condition_data else data_to_update
-
-  sql = f"UPDATE {tablename} SET {update_cols} WHERE {condition};"
-  values = { key: all_values[key] for key in all_values.keys() }
-
-  return sql, values
-
-@pool.execute()
-def do_delete(tablename="", condition="", condition_data={}):
-  sql = f"DELETE FROM {tablename} WHERE {condition};"
-  values = { key: condition_data[key] for key in condition_data.keys() }
-
-  return sql, values
-
-@pool.execute()
-def do_select(sql, values):
-  return sql, values
-
