@@ -35,7 +35,7 @@ class ReqSchema:
   def new_action(cls, source):
     return json_from(source, Schema({
       Required("category_id"): CustomValidators.UUID,
-      Required("description", default=""): str,
+      "description": str,
       "duration": cls.tstz_range
     }, extra=REMOVE_EXTRA))
 

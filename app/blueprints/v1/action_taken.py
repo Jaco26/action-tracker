@@ -46,12 +46,7 @@ def action_taken_view(res):
           "duration": DateTimeTZRange(duration["start_time"], duration["end_time"]),
           **{ key: action[key] for key in action.keys() if key != "duration" } 
         }
-        Query.do_insert(
-          "action_taken",
-          data=data,
-          colnames_text="user_id, category_id, description, duration",
-          values_text="%(user_id)s, %(category_id)s, %(description)s, %(duration)s"
-        )
+        Query.do_insert("action_taken", data=data)
       else:
         Query.do_insert("action_taken", data=action)
       res.status = 201
