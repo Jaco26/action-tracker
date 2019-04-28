@@ -4,21 +4,18 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from app.util.custom_api_response import with_res
 from app.util.validations.view_decorator import validate
 
+from app.util.request_schemas import ReqSchema
+from app.db import Query
+
 import app.queries.v1.action_category as db
 
 
 action_category_bp_v1 = Blueprint("action_category_bp_v1", __name__)
 
 @action_category_bp_v1.route("/", methods=["GET", "POST", "PUT", "DELETE"])
-@action_category_bp_v1.route("/<uuid:category_id>", methods=["DELETE"])
 @jwt_required
 @with_res
-@validate({
-  "category_name": str,
-  "category_id": str,
-  "new_category_name": str,
-})
-def action_category_view(req_body, res, category_id=None):
+def action_category_view(res):
   try:
     user_id = get_jwt_identity()
     if request.method == "GET":
@@ -27,21 +24,30 @@ def action_category_view(req_body, res, category_id=None):
       })
 
     elif request.method == "POST":
-      category_name = req_body.get("category_name")
-      if not db.user_action_category_exists(user_id, category_name):
-        db.insert_action_category(user_id, category_name)
+      category = ReqSchema.new_action_category(request.get_json())
+      if not db.user_action_category_exists(user_id, category["category_name"]):
+        db.insert_action_category(user_id, category["category_name"])
       res.add_data({ 
         'action_categories': db.select_category_by_user(user_id)
       })
+      res.status = 201
     
     elif request.method == "PUT":
-      new_category_name = req_body.get("new_category_name")
-      category_id = req_body.get("category_id")
-      db.update_action_category(new_category_name, category_id, user_id)
+      category = ReqSchema.update_action_category(request.get_json())
+      Query.do_update(
+        "action_category",
+        update_data={ key: category[key] for key in category.keys() if key != "id" },
+        condition_data={ "id": category["id"], "user_id": user_id }
+      )
+      res.status = 201
 
     elif request.method == "DELETE":
-      db.delete_from_action_category(str(category_id))
-     
+      category = ReqSchema.update_action_category(request.args)
+      Query.do_delete(
+        "action_category", 
+        condition_data={ "id": category["id"], "user_id": user_id }
+      )
+
   except BaseException as e:
     print(e)
     res.add_error(e)

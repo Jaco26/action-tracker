@@ -17,6 +17,14 @@ def json_from(source, schema):
 
 class ReqSchema:
 
+
+  @classmethod
+  def login_or_register(cls, source):
+    return json_from(source, Schema({
+      Required("username"): str,
+      Required("password"): str,
+    }, extra=REMOVE_EXTRA))
+
   @classmethod
   def tstz_range(cls, source):
     return json_from(source, Schema({
@@ -29,6 +37,19 @@ class ReqSchema:
     return json_from(source, Schema({
       Required("start_date"): Date(DateFormats.date),
       Required("end_date"): Date(DateFormats.date),
+    }, extra=REMOVE_EXTRA))
+
+  @classmethod
+  def new_action_category(cls, source):
+    return json_from(source, Schema({
+      Required("category_name"): str,
+    }, extra=REMOVE_EXTRA))
+
+  @classmethod
+  def update_action_category(cls, source):
+    return json_from(source, Schema({
+      Required("id"): CustomValidators.UUID,
+      "category_name": str,
     }, extra=REMOVE_EXTRA))
 
   @classmethod

@@ -81,6 +81,24 @@ class Query:
 
   @classmethod
   @pool.execute()
+  def custon_select(cls, sql, values):
+    return sql, values
+
+
+  @classmethod
+  @pool.execute()
+  def simple_select(cls, tablename="", condition_data={}):
+    condition_keys = condition_data.keys()
+    condition_text = " AND ".join([f"{colname} = %({colname})s" for colname in condition_keys])
+  
+    sql = f"SELECT * FROM {tablename} WHERE {condition_text}"
+    values = { colname: condition_data[colname] for colname in condition_keys }
+
+    return sql, values
+  
+
+  @classmethod
+  @pool.execute()
   def do_insert(cls, tablename="", data={}, colnames_text=None, values_text=None):
     data_keys = data.keys()
 
@@ -94,6 +112,7 @@ class Query:
     values = { key: data[key] for key in data_keys }
 
     return sql, values
+
 
   @classmethod
   @pool.execute()
@@ -113,6 +132,7 @@ class Query:
     values = { key: all_values[key] for key in all_values.keys() }
 
     return sql, values
+
 
   @classmethod
   @pool.execute()
