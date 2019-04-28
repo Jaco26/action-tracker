@@ -1,8 +1,9 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from psycopg2.extras import DateTimeTZRange
 
 from app.queries.v1 import action_taken
-from app.db import do_select, do_insert, do_update, do_delete
+from app.db import Query, do_select, do_insert, do_update, do_delete
 
 from app.util.custom_api_response import with_res
 from app.util.request_schemas import ReqSchema
@@ -38,13 +39,23 @@ def action_taken_view(res):
 
     elif request.method == "POST":
       action = ReqSchema.new_action(request.get_json())
-      do_insert(
-        tablename="action_taken", 
-        insert_data={
-          "user_id": user_id,
-          **action,
+      action.update({ "user_id": user_id })
+      duration = action.get("duration")
+      if duration:
+        data = {
+          "duration": DateTimeTZRange(duration["start_time"], duration["end_time"]),
+          **{ key: action[key] for key in action.keys() if key != "duration" } 
         }
-      )
+        Query.do_insert(
+          "action_taken",
+          data=data,
+          colnames_text="user_id, category_id, description, duration",
+          values_text="%(user_id)s, %(category_id)s, %(description)s, %(duration)s"
+        )
+      else:
+        Query.do_insert("action_taken", data=action)
+      res.status = 201
+   
 
     elif request.method == "PUT":
       action = ReqSchema.action_update(request.get_json())

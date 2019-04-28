@@ -1,4 +1,5 @@
 import uuid
+from psycopg2.extras import DateTimeTZRange
 from voluptuous import Schema, All, Required, Date, REMOVE_EXTRA
 
 class DateFormats:
@@ -19,24 +20,23 @@ class ReqSchema:
   @classmethod
   def tstz_range(cls, source):
     return json_from(source, Schema({
-      Required("start"): Date(DateFormats.timestamptz),
-      Required("end"): Date(DateFormats.timestamptz),
+      Required("start_time"): Date(DateFormats.timestamptz),
+      Required("end_time"): Date(DateFormats.timestamptz),
     }, extra=REMOVE_EXTRA))
 
   @classmethod
   def date_range(cls, source):
     return json_from(source, Schema({
-      Required("start"): Date(DateFormats.date),
-      Required("end"): Date(DateFormats.date),
+      Required("start_date"): Date(DateFormats.date),
+      Required("end_date"): Date(DateFormats.date),
     }, extra=REMOVE_EXTRA))
 
   @classmethod
   def new_action(cls, source):
     return json_from(source, Schema({
       Required("category_id"): CustomValidators.UUID,
-      "description": str,
-      "ts_override": Date(DateFormats.timestamptz),
-      "duration": cls.tstz_range,
+      Required("description", default=""): str,
+      "duration": cls.tstz_range
     }, extra=REMOVE_EXTRA))
 
   @classmethod
@@ -46,7 +46,6 @@ class ReqSchema:
       "user_id": CustomValidators.UUID,
       "category_id": CustomValidators.UUID,
       "description": str,
-      "ts_override": Date(DateFormats.timestamptz),
       "duration": cls.tstz_range,
     }, extra=REMOVE_EXTRA))
 

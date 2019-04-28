@@ -77,19 +77,38 @@ class Pool:
 pool = Pool()
 
 
+class Query:
+
+  @classmethod
+  @pool.execute()
+  def do_insert(cls, tablename="", data={}, colnames_text=None, values_text=None):
+    data_keys = data.keys()
+
+    if not colnames_text:
+      colnames_text = ", ".join([f"{colname}" for colname in data_keys])
+
+    if not values_text:
+      values_text = ", ".join([f"%({colname})s" for colname in data_keys])
+
+    sql = f"INSERT INTO {tablename} ({colnames_text}) VALUES({values_text});"
+    values = { key: data[key] for key in data_keys }
+
+    return sql, values
+
+      
+
 @pool.execute()
 def do_insert(tablename="", insert_data={}):
   keys = insert_data.keys()
   colnames = ", ".join([f"{colname}" for colname in keys])
   colvalues = ", ".join([f"%({colname})s" for colname in keys])
-  
   sql = f"INSERT INTO {tablename} ({colnames}) VALUES ({colvalues});"
   values = { key: insert_data[key] for key in keys }
  
   return sql, values
 
 @pool.execute()
-def do_update(tablename="", update_data={}, condition="", condition_data=None):
+def do_update(tablename="", duration=None, update_data={}, condition="", condition_data=None):
   keys = update_data.keys()
   update_cols = ", ".join([f"{colname} = %({colname})s" for colname in keys])
   all_values = { **update_data, **condition_data } if condition_data else data_to_update
