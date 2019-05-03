@@ -2,8 +2,6 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.util.custom_api_response import with_res
-from app.util.validations.view_decorator import validate
-
 from app.util.request_schemas import ReqSchema
 from app.db import Query
 
