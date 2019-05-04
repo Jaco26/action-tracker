@@ -1,6 +1,6 @@
 import uuid
 from psycopg2.extras import DateTimeTZRange
-from voluptuous import Schema, All, Required, Date, REMOVE_EXTRA
+from voluptuous import Schema, All, Required, Date, REMOVE_EXTRA, Invalid
 
 class DateFormats:
   date = "%Y-%m-%d"
@@ -9,6 +9,7 @@ class DateFormats:
 
 class CustomValidators:
   UUID = lambda val: str(uuid.UUID(val))
+  Coerce = lambda some_type: lambda val: some_type(val)
 
 
 def json_from(source, schema):
@@ -35,6 +36,12 @@ class ReqSchema:
     return json_from(source, Schema({
       Required("start_date"): Date(DateFormats.date),
       Required("end_date"): Date(DateFormats.date),
+    }, extra=REMOVE_EXTRA))
+
+  @classmethod
+  def get_actions(cls, source):
+    return json_from(source, Schema({
+      Required("offset", default=0): CustomValidators.Coerce(int),
     }, extra=REMOVE_EXTRA))
 
   @classmethod

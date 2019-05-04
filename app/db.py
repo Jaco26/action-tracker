@@ -56,6 +56,8 @@ class Pool:
                 result = [x for x in c.fetchall()]
               elif cursor_method == "fetchone":
                 result = c.fetchone()
+                # print("SQL", sql)
+                # print("FETCH ONE RESULT", result)
               if type(result) is list and not len(result):
                 return []
               return result
@@ -80,9 +82,11 @@ pool = Pool()
 class Query:
 
   @classmethod
-  @pool.execute()
-  def custon_select(cls, sql, values):
-    return sql, values
+  def custom_select(cls, mode="fetchall", sql="", values={}):
+    @pool.execute(mode)
+    def inner():
+      return sql, values
+    return inner()
 
 
   @classmethod
