@@ -7,7 +7,7 @@ from flask_jwt_extended import (
 )
 from werkzeug.security import generate_password_hash, check_password_hash
 from app.util.custom_api_response import with_res
-\from app.queries.v1 import auth as auth_sql
+from app.queries.v1 import auth as auth_sql
 from app.util.request_schemas import ReqSchema
 
 auth_bp_v1 = Blueprint('auth_bp_v1', __name__)

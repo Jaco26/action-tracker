@@ -3,25 +3,26 @@ from flask import Flask, Response, json
 
 
 class ApiResult:
-  def __init__(self, status=200):
-    self.data = {}
-    self.message = ""
-    self.errors = []
-    self.status = status
+  data = {}
+  num_results = None
+  offset = None
+
+  errors = []
+  message = ""
+  status = 200
 
   def add_data(self, data):
     self.data.update(data)
 
-  def add_error(self, error="", message=""):
-    self.errors.append({
-      "message": message, 
-      "error": str(error)
-    })
+  def add_error(self, error=""):
+    self.errors.append(str(error))
 
   def to_response(self):
     return Response(
       json.dumps(dict(
         data=self.data,
+        num_results=self.num_results,
+        offset=self.offset,
         message=self.message,
         errors=self.errors
       )),

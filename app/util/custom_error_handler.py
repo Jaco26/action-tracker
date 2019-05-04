@@ -7,13 +7,11 @@ class CustomErrorHandler:
     if isinstance(error, HTTPException):
       result = {
         'code': error.code,
-        # 'description': error.description,
         'message': str(error),
       }
     else:
       result = {
         'code': 500,
-        # 'description': error.description,
         'message': str(error),
       }
     res = jsonify(result)

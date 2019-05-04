@@ -13,11 +13,9 @@ class CustomValidators:
 
 def json_from(source, schema):
   return schema(dict(source)) if source else None
-
+  
 
 class ReqSchema:
-
-
   @classmethod
   def login_or_register(cls, source):
     return json_from(source, Schema({
