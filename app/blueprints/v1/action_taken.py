@@ -23,7 +23,9 @@ def action_taken_view(res):
     user_id = get_jwt_identity()
 
     if request.method == "GET":      
-      if request.args.get("start_date"):
+      action_request = ReqSchema.get_actions(request.args)
+
+      if action_request.get("start_date"):
         date_range = ReqSchema.date_range(request.args)
         start = date_range["start"]
         start_d = datetime.strptime(start, "%Y-%m-%d")
@@ -37,8 +39,7 @@ def action_taken_view(res):
         })
       else:
         
-        action_request = ReqSchema.get_actions(request.args)
-        offset = action_request["offset"] if action_request else 0
+        offset = action_request["offset"]
       
         result_count = queries.count_actions_taken_by(user_id).get("count")
 

@@ -10,10 +10,14 @@ class DateFormats:
 class CustomValidators:
   UUID = lambda val: str(uuid.UUID(val))
   Coerce = lambda some_type: lambda val: some_type(val)
+  
 
 
 def json_from(source, schema):
-  return schema(dict(source)) if source else None
+  if not source:
+    source = {}
+  return schema(dict(source))
+  # return schema(dict(source)) if source else None
   
 
 class ReqSchema:
@@ -42,6 +46,8 @@ class ReqSchema:
   def get_actions(cls, source):
     return json_from(source, Schema({
       Required("offset", default=0): CustomValidators.Coerce(int),
+      "start_date": Date(DateFormats.date),
+      "end_date": Date(DateFormats.date),
     }, extra=REMOVE_EXTRA))
 
   @classmethod
