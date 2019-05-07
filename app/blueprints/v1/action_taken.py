@@ -25,30 +25,28 @@ def action_taken_view(res):
     if request.method == "GET":      
       action_request = ReqSchema.get_actions(request.args)
 
+      action_request.update({ "user_id": user_id })
+
       if action_request.get("start_date"):
-        date_range = ReqSchema.date_range(request.args)
-        start = date_range["start"]
-        start_d = datetime.strptime(start, "%Y-%m-%d")
-        end = date_range["end"]
-        end_d = datetime.strptime(end, "%Y-%m-%d")
 
+        result_count = queries.count_all_between_dates(**action_request).get("count")
+        res.result_count = result_count
 
-        end_end_of_day = end_d + timedelta(seconds=86399)
-        res.add_data({
-          'actions': action_taken.get_all_between_dates(user_id, start_d, end_end_of_day),
-        })
+        if result_count:
+          result = queries.get_all_between_dates(**action_request)
+          res.add_data({
+            'actions': result,
+          })
       else:
-        
-        offset = action_request["offset"]
-      
         result_count = queries.count_actions_taken_by(user_id).get("count")
+        if result_count:
+          if result_count > offset + GET_REQUEST_LIMIT:
+            res.next_page_url = f"/api/v1/action-taken/?offset={offset + GET_REQUEST_LIMIT}"
 
-        if result_count and result_count > offset + GET_REQUEST_LIMIT:
-          res.next_page_url = f"/api/v1/action-taken/?offset={offset + GET_REQUEST_LIMIT}"
-
-        res.add_data({
-          "actions": queries.get_page_of_actions_taken_by(user_id, offset, GET_REQUEST_LIMIT)
-        })
+          res.add_data({
+            "actions": queries.get_page_of_actions_taken_by(user_id, offset, GET_REQUEST_LIMIT)
+          })
+          
         res.result_count = result_count
         res.offset = offset
  

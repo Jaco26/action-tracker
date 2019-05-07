@@ -42,6 +42,14 @@ def count_actions_taken_by(user_id):
 
 
 @pool.execute()
+def count_all_between_dates(user_id, start_date, end_date):
+  sql = """SELECT COUNT(id) FROM action_taken
+            WHERE user_id = %(user_id)s
+            AND ts BETWEEN %(start_date)s AND %(end_date)s;"""
+  return sql, { "user_id": user_id, "start_date": start_date, "end_date": end_date }
+
+
+@pool.execute()
 def get_all_between_dates(user_id, d1, d2):
   sql = """SELECT * FROM action_taken 
            WHERE user_id = %s AND date_trunc('hour', ts) 
